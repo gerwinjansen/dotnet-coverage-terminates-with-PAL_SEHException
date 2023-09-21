@@ -38,7 +38,12 @@ jobs:
     - name: Start dotnet-coverage
       run: |
         ulimit -c unlimited
-        ./coverage/dotnet-coverage collect "dotnet --version"
+        
+        OUTPUT=$(./coverage/dotnet-coverage collect "dotnet --version" 2>&1 | tee /dev/stderr)
+        if [[ $OUTPUT = *Exception* ]]
+        then
+            exit 1
+        fi
 
     - name: print stacktrace
       if: failure()
