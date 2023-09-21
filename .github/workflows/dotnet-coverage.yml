@@ -34,7 +34,7 @@ jobs:
     - name: Start dotnet-coverage
       run: |
         ulimit -c unlimited
-        ./coverage/dotnet-coverage dotnet --version
+        ./coverage/dotnet-coverage collect dotnet --version
 
     - name: print stacktrace
       if: failure()
