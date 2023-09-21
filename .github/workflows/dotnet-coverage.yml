@@ -1,0 +1,42 @@
+name: 'Reproduce dotnet-coverage crash'
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  repro-with-latest-version-and-dotnet-6:
+    runs-on: [ ubuntu-latest ]
+
+    steps:
+    - name: Setup .NET Core SDK
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: 6
+        dotnet-quality: 'ga'
+      
+    - name: install GDB  
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y gdb
+
+    - name: Install dotnet-coverage
+      run: |
+        dotnet tool update dotnet-coverage --tool-path ./coverage
+        
+    - name: Enable core dumps
+      run: |
+        sudo mkdir /cores
+        sudo chmod 777 /cores
+        sudo bash -c 'echo "/cores/%e.%p.%t" > /proc/sys/kernel/core_pattern'
+      
+    - name: Start dotnet-coverage
+      run: |
+        ulimit -c unlimited
+        ./coverage/dotnet-coverage dotnet --version
+
+    - name: print stacktrace
+      if: failure()
+      run: |
+        gdb -ex bt -ex quit $(which dotnet) $(find /cores/ -name dotnet.*)
