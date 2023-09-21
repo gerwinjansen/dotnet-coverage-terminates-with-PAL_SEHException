@@ -8,6 +8,7 @@ on:
 jobs:
   repro-with-latest-version-and-dotnet-6:
     strategy:
+      fail-fast: false
       matrix:
         dotnet-coverage-version: ['17.1.2', '17.2.0', '17.8.6']
         dotnet-version: ['6.0.414', '7.0.401', '8.0.100-rc.1.23463.5']
