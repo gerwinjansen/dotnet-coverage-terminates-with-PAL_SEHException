@@ -6,12 +6,12 @@ on:
   workflow_dispatch:
 
 jobs:
-  repro-with-latest-version-and-dotnet-6:
+  repro:
     strategy:
       fail-fast: false
       matrix:
         dotnet-coverage-version: ['17.1.2', '17.2.0', '17.8.6']
-        dotnet-version: ['6.0.414', '7.0.401', '8.0.100-rc.1.23463.5']
+        dotnet-version: ['3.1.426', '5.0.408', '6.0.414', '7.0.401', '8.0.100-rc.1.23463.5']
     runs-on: [ ubuntu-latest ]
 
     steps:
@@ -39,10 +39,11 @@ jobs:
       run: |
         ulimit -c unlimited
         
+        # Workaround for version 17.2.0 which always exits with 0, even if an exception is raised
         OUTPUT=$(./coverage/dotnet-coverage collect "dotnet --version" 2>&1 | tee /dev/stderr)
         if [[ $OUTPUT = *Exception* ]]
         then
-            exit 1
+            exit 139
         fi
 
     - name: print stacktrace
