@@ -38,6 +38,14 @@ jobs:
     - name: Start dotnet-coverage
       run: |
         ulimit -c unlimited
+
+        cat <<EOT >> global.json
+        {
+          "sdk": {
+            "version": "${{ matrix.dotnet-version }}"
+          }
+        }
+        EOT
         
         # Workaround for version 17.2.0 which always exits with 0, even if an exception is raised
         OUTPUT=$(./coverage/dotnet-coverage collect "dotnet --version" 2>&1 | tee /dev/stderr)
